@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajax with jQuery: GET and POST</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    button {
+      margin: 10px 0;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    input, textarea {
+      margin: 5px 0;
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      background-color: #f9f9f9;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Ajax with jQuery: GET and POST</h1>
+
+<!-- GET Request Section -->
+<h2>1. Fetch Post Data (GET Request with $.get)</h2>
+<button id="getRequest">Fetch Post</button>
+<div id="getResult"></div>
+
+<!-- POST Request Section -->
+<h2>2. Submit Post Data (POST Request with $.post)</h2>
+<label for="title">Title:</label>
+<input type="text" id="title" placeholder="Enter post title">
+<label for="body">Body:</label>
+<textarea id="body" rows="4" placeholder="Enter post body"></textarea>
+<button id="postRequest">Submit Post</button>
+<div id="postResult"></div>
+
+<!-- Custom Ajax Request Section -->
+<h2>3. Custom Ajax Request (Using $.ajax)</h2>
+<button id="ajaxRequest">Fetch All Posts</button>
+<div id="ajaxResult"></div>
+
+<script>
+  $(document).ready(function () {
+    // GET Request using $.get
+    $("#getRequest").on("click", function () {
+      $.get("https://jsonplaceholder.typicode.com/posts/1", function (data) {
+        $("#getResult").html(`
+                        <div class="success">
+                            <h3>Post Title:</h3>
+                            <p>${data.title}</p>
+                            <h3>Post Body:</h3>
+                            <p>${data.body}</p>
+                        </div>
+                    `);
+      }).fail(function () {
+        $("#getResult").html('<div class="error">Error fetching data.</div>');
+      });
+    });
+
+    // POST Request using $.post
+    $("#postRequest").on("click", function () {
+      const title = $("#title").val();
+      const body = $("#body").val();
+
+      if (!title || !body) {
+        alert("Please fill in both Title and Body fields.");
+        return;
+      }
+
+      $.post(
+              "https://jsonplaceholder.typicode.com/posts",
+              { title: title, body: body, userId: 1 },
+              function (data) {
+                $("#postResult").html(`
+                            <div class="success">
+                                <h3>Post Submitted Successfully!</h3>
+                                <p><strong>Title:</strong> ${data.title}</p>
+                                <p><strong>Body:</strong> ${data.body}</p>
+                                <p><strong>ID:</strong> ${data.id}</p>
+                            </div>
+                        `);
+              }
+      ).fail(function () {
+        $("#postResult").html('<div class="error">Error submitting post.</div>');
+      });
+    });
+
+    // Custom Ajax Request using $.ajax
+    $("#ajaxRequest").on("click", function () {
+      $.ajax({
+        url: "https://jsonplaceholder.typicode.com/posts",
+        method: "GET",
+        success: function (data) {
+          let resultHtml = '<h3>All Posts:</h3>';
+          data.slice(0, 5).forEach(post => {
+            resultHtml += `
+                                <div>
+                                    <h4>${post.title}</h4>
+                                    <p>${post.body}</p>
+                                </div>
+                            `;
+          });
+          $("#ajaxResult").html(resultHtml);
+        },
+        error: function () {
+          $("#ajaxResult").html('<div class="error">Error fetching posts.</div>');
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
